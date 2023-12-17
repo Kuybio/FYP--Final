@@ -23,7 +23,7 @@ const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
 const syncJob = schedule.scheduleJob('*/1 * * * *', function() {
     console.log('Running Sync Job');
     syncService.syncNewStudentsWithBlockchain();
-    syncService.syncUpdatesWithBlockchain();
+    syncService.syncUpdatedStudentsWithBlockchain();
 });
 
 // Endpoint to add a student (can be used if manual addition is needed)
