@@ -4,7 +4,7 @@ const blockchain = require('../server/blockchain');
 const fetchNewStudents = () => {
     return new Promise((resolve, reject) => {
         // Example query: Select students that haven't been synced
-        const query = 'SELECT * FROM Students WHERE isNew = TRUE OR lastSyncTime IS NULL';
+        const query = 'SELECT * FROM Students WHERE syncedWithBlockchain = FALSE OR updateSynced = FALSE';
         database.query(query, (error, results) => {
             if (error) {
                 reject(error);
