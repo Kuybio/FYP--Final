@@ -18,7 +18,7 @@ async function fetchUpdatedStudents() {
     try {
         // Update the query as per your database schema
         const query = 'SELECT * FROM ChangeLog WHERE synced = FALSE';
-        const [results] = await database.query(query);
+        const [results] = await database.execute(query);
         return Array.isArray(results) ? results : [results]; // Ensure an array is returned
     } catch (error) {
         console.error('Error fetching updated students:', error);
