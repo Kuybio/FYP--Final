@@ -1,5 +1,5 @@
 const database = require('../server/database'); // Adjust path as necessary
-const { addOrUpdateStudent } = require('../server/blockchain');
+const { addStudent, updateStudent } = require('../server/blockchain');
 
 // Function to fetch new students who are not yet in the blockchain
 const fetchNewStudents = () => {
@@ -12,7 +12,7 @@ const fetchNewStudents = () => {
                 resolve(results);
             }
         });
-    });
+    }); //lmao
 };
 
 // Function to fetch unsynced changes from the ChangeLog table
@@ -34,8 +34,8 @@ const syncNewStudentsWithBlockchain = async () => {
     const newStudents = await fetchNewStudents();
     for (const student of newStudents) {
         try {
-            await addOrUpdateStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear, '0xB4cE6bac673F150ba36D53E3dfd94dCf59a3129c', '0x6449d67debeb3b9471474b20b74b5e04ebbcf4c97ff48c8dde24b1257f07ad6b');
-            // Consider marking these students as synced in some way, perhaps in a separate column or table
+            await addStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
+            // TODO: Mark these students as synced in a separate column or table
         } catch (error) {
             console.error(`Failed to sync new student ${student.studentId}:`, error);
         }
@@ -47,9 +47,7 @@ const syncUpdatesWithBlockchain = async () => {
     const changes = await fetchUnsyncedChanges();
     for (const change of changes) {
         try {
-            await addOrUpdateStudent(change.studentId, /* other parameters based on change */);
-
-            // Update the ChangeLog entry as synced
+            await updateStudent(change.studentId, change.newName, change.newProgramme, change.newJoinYear, change.newCgpa, change.newGraduateYear);
             const updateQuery = 'UPDATE ChangeLog SET synced = TRUE WHERE id = ?';
             await new Promise((resolve, reject) => {
                 database.query(updateQuery, [change.id], (error) => {
@@ -74,6 +72,5 @@ module.exports = {
     syncNewStudentsWithBlockchain,
     syncUpdatesWithBlockchain,
     fetchNewStudents,
-    fetchUnsyncedChanges,
-    addOrUpdateStudent
+    fetchUnsyncedChanges
 };
