@@ -1,11 +1,10 @@
 const database = require('../server/database');
 const blockchain = require('../server/blockchain');
 
-// Function to fetch new students who are not yet in the blockchain
 const fetchNewStudents = () => {
     return new Promise((resolve, reject) => {
-        // Query to select only new students
-        const query = 'SELECT * FROM Students WHERE isNew = TRUE';
+        // Adjust the query to match your logic for identifying new students
+        const query = 'SELECT * FROM Students WHERE [Your Logic for New Students]';
         database.query(query, (error, results) => {
             if (error) {
                 reject(error);
@@ -15,7 +14,6 @@ const fetchNewStudents = () => {
         });
     });
 };
-
 // Function to fetch unsynced changes from the ChangeLog table
 const fetchUnsyncedChanges = () => {
     return new Promise((resolve, reject) => {
