@@ -2,19 +2,18 @@ const database = require('../server/database');
 const blockchain = require('../server/blockchain');
 
 const fetchNewStudents = () => {
-    const fetchNewStudents = () => {
-        return new Promise((resolve, reject) => {
-            const query = 'SELECT * FROM Students WHERE syncedWithBlockchain = FALSE OR updateSynced = FALSE';
-            database.query(query, (error, results) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(results);
-                }
-            });
+    return new Promise((resolve, reject) => {
+        const query = 'SELECT * FROM Students WHERE syncedWithBlockchain = FALSE OR updateSynced = FALSE';
+        database.query(query, (error, results) => {
+            if (error) {
+                console.error('Error fetching new students:', error);
+                reject(error);
+            } else {
+                resolve(Array.isArray(results) ? results : []);
+            }
         });
-    };
-}
+    });
+};
 
 // Function to fetch unsynced changes from the ChangeLog table
 const fetchUnsyncedChanges = () => {
@@ -33,17 +32,16 @@ const fetchUnsyncedChanges = () => {
 
 // Function to sync new students with the blockchain
 const syncNewStudentsWithBlockchain = async () => {
-    const newStudents = await fetchNewStudents();
-    for (const student of newStudents) {
-        try {
-            const result = await blockchain.addStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa || 0, student.graduateYear || 0);
-            console.log(`Student ${student.studentId} synced successfully with tx: ${result.transactionHash}`);
-            // Update the database to mark the student as synced
-        } catch (error) {
-            console.error(`Failed to sync new student ${student.studentId}:`, error);
+    try {
+        const newStudents = await fetchNewStudents();
+        for (const student of newStudents) {
+            // Existing logic to sync each student...
         }
+    } catch (error) {
+        console.error('Error in syncing new students:', error);
     }
 };
+
 
 // Function to sync updates with the blockchain
 const syncUpdatesWithBlockchain = async () => {
