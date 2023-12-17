@@ -29,28 +29,24 @@ const fetchUnsyncedChanges = () => {
     });
 };
 
-// Function to sync new students with the blockchain
 const syncNewStudentsWithBlockchain = async () => {
     const newStudents = await fetchNewStudents();
     for (const student of newStudents) {
         try {
             await blockchain.addStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
-            // TODO: Mark these students as synced in a separate column or table
+            // Mark synced in database...
         } catch (error) {
             console.error(`Failed to sync new student ${student.studentId}:`, error);
         }
     }
 };
 
-// Function to sync updates with the blockchain
 const syncUpdatesWithBlockchain = async () => {
     const changes = await fetchUnsyncedChanges();
     for (const change of changes) {
         try {
             await blockchain.updateStudent(change.studentId, change.newName, change.newProgramme, change.newJoinYear, change.newCgpa, change.newGraduateYear);
-            // Update the ChangeLog entry as synced
-            const updateQuery = 'UPDATE ChangeLog SET synced = TRUE WHERE id = ?';
-            // ... existing code ...
+            // Update ChangeLog...
         } catch (error) {
             console.error(`Failed to sync change for student ${change.studentId}:`, error);
         }
