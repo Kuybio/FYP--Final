@@ -2,8 +2,8 @@ const Web3 = require('web3');
 const { abi } = require('../build/contracts/UniversityData.json'); // Update path to ABI file
 
 const web3 = new Web3('http://localhost:7545'); // Update with your provider URL
-const contractAddress = '0x0C4545eeEE323206C47ca62b978fA9199292e4A4'; // Update with your contract address
-const privateKey = '0xa8e80c311133db047d75d286bc69904c0e652f9c98e06891ecaca8b0b1f0c576'; // Update with your private key
+const contractAddress = '0x6c35F6F7F727A7bB676e5BB73Ff66C6240D5B50c'; // Update with your contract address
+const privateKey = '0x6449d67debeb3b9471474b20b74b5e04ebbcf4c97ff48c8dde24b1257f07ad6b'; // Update with your private key
 
 const universityDataContract = new web3.eth.Contract(abi, contractAddress);
 
