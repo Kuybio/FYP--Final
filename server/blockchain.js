@@ -1,56 +1,40 @@
 const Web3 = require('web3');
-const { abi } = require('../build/contracts/UniversityData.json'); // Update path to ABI file
+const contractABI = require('../build/contracts/UniversityData.json').abi; // Replace with actual ABI file path
+const contractAddress = '0x6c35F6F7F727A7bB676e5BB73Ff66C6240D5B50c'; // Replace with your deployed contract address
 
-const web3 = new Web3('http://localhost:7545'); // Update with your provider URL
-const contractAddress = '0x6c35F6F7F727A7bB676e5BB73Ff66C6240D5B50c'; // Update with your contract address
-const privateKey = '0x6449d67debeb3b9471474b20b74b5e04ebbcf4c97ff48c8dde24b1257f07ad6b'; // Update with your private key
+const web3 = new Web3('http://localhost:7545'); // Replace with your Ethereum node URL
 
-const universityDataContract = new web3.eth.Contract(abi, contractAddress);
+// Function to add or update student on the blockchain
+async function addOrUpdateStudent(studentId, name, programme, joinYear, cgpa, graduateYear, fromAddress, privateKey) {
+    const universityDataV2 = new web3.eth.Contract(contractABI, contractAddress);
 
-async function addStudent(studentId, name, programme, joinYear, cgpa, graduateYear) {
-    const fromAddress = web3.eth.accounts.privateKeyToAccount(privateKey).address;
-    
-    const data = universityDataContract.methods.addStudent(studentId, name, programme, joinYear, cgpa, graduateYear).encodeABI();
+    let data;
+    // Check if student exists, to decide whether to add or update
+    const studentExists = await universityDataV2.methods.getStudent(studentId).call();
+    if (studentExists.studentId === '0') { // Assuming a non-existent student returns '0' for studentId
+        data = universityDataV2.methods.addStudent(studentId, name, programme, joinYear, cgpa, graduateYear).encodeABI();
+    } else {
+        data = universityDataV2.methods.updateStudent(studentId, name, programme, joinYear, cgpa, graduateYear).encodeABI();
+    }
 
-    const tx = {
+    const transaction = {
         from: fromAddress,
         to: contractAddress,
         data: data,
-        gas: await estimateGas(fromAddress, data),
+        gas: 2000000 // Set appropriate gas limit
     };
 
-    return sendTransaction(tx, privateKey);
+    const signedTx = await web3.eth.accounts.signTransaction(transaction, privateKey);
+    return await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 }
 
-async function updateStudent(studentId, name, programme, joinYear, cgpa, graduateYear) {
-    const fromAddress = web3.eth.accounts.privateKeyToAccount(privateKey).address;
-
-    const data = universityDataContract.methods.updateStudent(studentId, name, programme, joinYear, cgpa, graduateYear).encodeABI();
-
-    const tx = {
-        from: fromAddress,
-        to: contractAddress,
-        data: data,
-        gas: await estimateGas(fromAddress, data),
-    };
-
-    return sendTransaction(tx, privateKey);
-}
-
-async function estimateGas(fromAddress, data) {
-    return await web3.eth.estimateGas({
-        from: fromAddress,
-        to: contractAddress,
-        data: data,
-    });
-}
-
-async function sendTransaction(tx, privateKey) {
-    const signedTx = await web3.eth.accounts.signTransaction(tx, privateKey);
-    return web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+// Function to get student data
+async function getStudent(studentId) {
+    const universityDataV2 = new web3.eth.Contract(contractABI, contractAddress);
+    return await universityDataV2.methods.getStudent(studentId).call();
 }
 
 module.exports = {
-    addStudent,
-    updateStudent,
+    addOrUpdateStudent,
+    getStudent
 };
