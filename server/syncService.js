@@ -5,7 +5,7 @@ const blockchain = require('../server/blockchain'); // Update the path as necess
 async function fetchNewStudents() {
     try {
         const query = 'SELECT * FROM Students WHERE syncedWithBlockchain = FALSE';
-        const results = await database.query(query);
+        const results = await database.execute(query);
         return results;
     } catch (error) {
         console.error('Error fetching new students:', error);
@@ -17,7 +17,7 @@ async function fetchNewStudents() {
 async function fetchUpdatedStudents() {
     try {
         const query = 'SELECT * FROM ChangeLog WHERE syncedWithBlockchain = FALSE';
-        const results = await database.query(query);
+        const results = await database.execute(query);
         return results;
     } catch (error) {
         console.error('Error fetching updated students:', error);
