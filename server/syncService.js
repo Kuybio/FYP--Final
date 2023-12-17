@@ -5,11 +5,11 @@ const blockchain = require('../server/blockchain'); // Update the path as necess
 async function fetchNewStudents() {
     try {
         const query = 'SELECT * FROM Students WHERE syncedWithBlockchain = FALSE';
-        const [results] = await database.execute(query);
-        return results;
+        const results = await database.execute(query);
+        return results[0]; // Assuming results[0] contains the array of students
     } catch (error) {
         console.error('Error fetching new students:', error);
-        return [];
+        return []; // Always return an array, even if empty
     }
 }
 
@@ -28,16 +28,21 @@ async function fetchUpdatedStudents() {
 // Sync new students with the blockchain
 async function syncNewStudentsWithBlockchain() {
     const newStudents = await fetchNewStudents();
-    for (const student of newStudents) {
-        try {
-            const txResult = await blockchain.addStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
-            console.log(`Student ${student.studentId} added to blockchain: ${txResult.transactionHash}`);
-            // Update database as synced
-        } catch (error) {
-            console.error(`Failed to sync new student ${student.studentId}:`, error);
+    if (Array.isArray(newStudents)) {
+        for (const student of newStudents) {
+            try {
+                const txResult = await blockchain.addStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
+                console.log(`Student ${student.studentId} added to blockchain: ${txResult.transactionHash}`);
+                // Update database as synced
+            } catch (error) {
+                console.error(`Failed to sync new student ${student.studentId}:`, error);
+            }
         }
+    } else {
+        console.error('newStudents is not an array:', newStudents);
     }
 }
+
 
 // Sync updated students with the blockchain
 async function syncUpdatedStudentsWithBlockchain() {
