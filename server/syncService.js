@@ -10,10 +10,14 @@ async function fetchNewStudents() {
     try {
         // Replace with your actual query to fetch new students
         const query = 'SELECT * FROM Students WHERE syncedWithBlockchain = FALSE';
-        const results = await database.execute(query);
-        
-        // Assuming 'results' is an array of students
-        return results;
+        // The 'query' method is used to execute the query in mysql library
+        connection.query(query, (error, results, fields) => {
+            if (error) {
+                throw error; // If there's an error, we throw it so it can be caught by the catch block
+            }
+            // If results are fetched successfully, we proceed with them
+            // Ensure you handle the results correctly here
+        });
     } catch (error) {
         console.error('Error fetching new students:', error);
         return []; // Always return an array, even if empty
