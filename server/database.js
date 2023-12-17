@@ -12,4 +12,21 @@ connection.connect((err) => {
   console.log('Connected to MySQL Database!');
 });
 
-module.exports = connection;
+// Function to execute a query and return a promise
+function execute(query) {
+  return new Promise((resolve, reject) => {
+      connection.query(query, (error, results, fields) => {
+          if (error) {
+              reject(error);
+              return;
+          }
+          resolve(results);
+      });
+  });
+}
+
+// Export the execute function
+module.exports = {
+  execute,
+  connection
+};
