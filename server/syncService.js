@@ -39,8 +39,8 @@ async function getStudentData(studentId) {
 
 // Function to sync new students with the blockchain
 async function syncNewStudentsWithBlockchain() {
-    const newStudents = await fetchNewStudents();
-    for (const student of studentChanges) {
+    const newStudents = await fetchNewStudents(); // This function should return an array of new students
+    for (const student of newStudents) { // Make sure 'newStudents' is the array you want to iterate over
         try {
             // Make sure all data is defined
             const studentData = {
