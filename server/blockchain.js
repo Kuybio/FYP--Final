@@ -1,5 +1,5 @@
 const Web3 = require('web3');
-const UniversityDataContract = require('./UniversityDataContract.json');
+const UniversityDataContract = require('../build/contracts/UniversityData.json');
 
 const web3 = new Web3('http://localhost:7545'); // Adjust with your Ethereum client URL
 const contractAddress = 'YOUR_CONTRACT_ADDRESS'; // Replace with your contract address
