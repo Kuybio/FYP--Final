@@ -5,25 +5,27 @@ const blockchain = require('../server/blockchain'); // Update the path as necess
 async function fetchNewStudents() {
     try {
         const query = 'SELECT * FROM Students WHERE syncedWithBlockchain = FALSE';
-        const results = await database.execute(query);
-        return results[0]; // Assuming results[0] contains the array of students
+        const [results] = await database.execute(query);
+        return Array.isArray(results) ? results : [results]; // Ensure an array is returned
     } catch (error) {
         console.error('Error fetching new students:', error);
-        return []; // Always return an array, even if empty
+        return []; // Return an empty array in case of error
     }
 }
 
 // Function to fetch updated students from the database
 async function fetchUpdatedStudents() {
     try {
-        const query = 'SELECT * FROM ChangeLog WHERE syncedWithBlockchain = FALSE';
-        const [results] = await database.execute(query);
-        return results;
+        // Update the query as per your database schema
+        const query = 'SELECT * FROM ChangeLog WHERE synced = FALSE';
+        const [results] = await database.query(query);
+        return Array.isArray(results) ? results : [results]; // Ensure an array is returned
     } catch (error) {
         console.error('Error fetching updated students:', error);
-        return [];
+        return []; // Return an empty array in case of error
     }
 }
+
 
 // Sync new students with the blockchain
 async function syncNewStudentsWithBlockchain() {
