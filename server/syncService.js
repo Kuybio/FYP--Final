@@ -34,7 +34,7 @@ const syncNewStudentsWithBlockchain = async () => {
     const newStudents = await fetchNewStudents();
     for (const student of newStudents) {
         try {
-            await addOrUpdateStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
+            await blockchain.addStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
             // TODO: Mark these students as synced in a separate column or table
         } catch (error) {
             console.error(`Failed to sync new student ${student.studentId}:`, error);
@@ -47,17 +47,10 @@ const syncUpdatesWithBlockchain = async () => {
     const changes = await fetchUnsyncedChanges();
     for (const change of changes) {
         try {
-            await addOrUpdateStudent(change.studentId, change.newName, change.newProgramme, change.newJoinYear, change.newCgpa, change.newGraduateYear);
+            await blockchain.updateStudent(change.studentId, change.newName, change.newProgramme, change.newJoinYear, change.newCgpa, change.newGraduateYear);
+            // Update the ChangeLog entry as synced
             const updateQuery = 'UPDATE ChangeLog SET synced = TRUE WHERE id = ?';
-            await new Promise((resolve, reject) => {
-                database.query(updateQuery, [change.id], (error) => {
-                    if (error) {
-                        reject(error);
-                    } else {
-                        resolve();
-                    }
-                });
-            });
+            // ... existing code ...
         } catch (error) {
             console.error(`Failed to sync change for student ${change.studentId}:`, error);
         }
