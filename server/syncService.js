@@ -2,22 +2,15 @@ const database = require('../server/database'); // Update the path as necessary
 const blockchain = require('../server/blockchain'); // Update the path as necessary
 
 // Ethereum account details
-const fromAddress = 0xB4cE6bac673F150ba36D53E3dfd94dCf59a3129c; // Replace with your Ethereum account address
-const privateKey = 0x6449d67debeb3b9471474b20b74b5e04ebbcf4c97ff48c8dde24b1257f07ad6b; // Replace with your private key
+const fromAddress = '0xB4cE6bac673F150ba36D53E3dfd94dCf59a3129c'; // Replace with your Ethereum account address
+const privateKey = '0x6449d67debeb3b9471474b20b74b5e04ebbcf4c97ff48c8dde24b1257f07ad6b'; // Replace with your private key
 
 // Function to fetch new students from the database
 async function fetchNewStudents() {
     try {
-        // Replace with your actual query to fetch new students
         const query = 'SELECT * FROM Students WHERE syncedWithBlockchain = FALSE';
-        // The 'query' method is used to execute the query in mysql library
-        connection.query(query, (error, results, fields) => {
-            if (error) {
-                throw error; // If there's an error, we throw it so it can be caught by the catch block
-            }
-            // If results are fetched successfully, we proceed with them
-            // Ensure you handle the results correctly here
-        });
+        const results = await database.execute(query); // Update this line as per your database execution method
+        return results; // This will be an array of rows from the database
     } catch (error) {
         console.error('Error fetching new students:', error);
         return []; // Always return an array, even if empty
@@ -26,16 +19,15 @@ async function fetchNewStudents() {
 
 // Function to fetch updated student changes from the ChangeLog table
 async function fetchUpdatedStudents() {
-    const query = 'SELECT * FROM ChangeLog WHERE synced = FALSE';
-    database.query(query, (error, results) => {
-        if (error) {
-            console.error('Error fetching student changes:', error);
-            reject(error);
-        } else {
-            resolve(Array.isArray(results) ? results : []);
-        }
-    });
-};
+    try {
+        const query = 'SELECT * FROM ChangeLog WHERE synced = FALSE';
+        const results = await database.execute(query); // Update this line as per your database execution method
+        return results; // This will be an array of change logs
+    } catch (error) {
+        console.error('Error fetching student changes:', error);
+        return []; // Always return an array, even if empty
+    }
+}
 
 // Helper function to get complete student data by ID
 async function getStudentData(studentId) {
