@@ -1,47 +1,43 @@
-const database = require('../server/database'); // Update the path as necessary
-const blockchain = require('../server/blockchain'); // Update the path as necessary
-
-// Ethereum account details
-const fromAddress = '0xB4cE6bac673F150ba36D53E3dfd94dCf59a3129c'; // Replace with your Ethereum account address
-const privateKey = '0x6449d67debeb3b9471474b20b74b5e04ebbcf4c97ff48c8dde24b1257f07ad6b'; // Replace with your private key
+const database = require('./database'); // Update the path as necessary
+const blockchain = require('./blockchain'); // Update the path as necessary
 
 // Function to fetch new students from the database
 async function fetchNewStudents() {
     try {
         const query = 'SELECT * FROM Students WHERE syncedWithBlockchain = FALSE';
-        const results = await database.execute(query);
-        return results; // This will be an array of rows from the database
+        const results = await database.query(query);
+        return results;
     } catch (error) {
         console.error('Error fetching new students:', error);
         return []; // Always return an array, even if empty
     }
 }
 
-// Fetch updated students from the database
+// Function to fetch updated students from the database
 async function fetchUpdatedStudents() {
     try {
-        const query = 'SELECT * FROM ChangeLog WHERE synced = FALSE';
-        const updatedStudents = await database.execute(query);
-        return updatedStudents;
+        const query = 'SELECT * FROM ChangeLog WHERE syncedWithBlockchain = FALSE';
+        const results = await database.query(query);
+        return results;
     } catch (error) {
         console.error('Error fetching updated students:', error);
-        return [];
+        return []; // Always return an array, even if empty
     }
 }
 
 // Sync new students with the blockchain
 async function syncNewStudentsWithBlockchain() {
     const newStudents = await fetchNewStudents();
-    if (newStudents.length > 0) {
-        for (const student of newStudents) {
-            try {
-                await blockchain.addStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
-                const updateQuery = `UPDATE Students SET syncedWithBlockchain = TRUE WHERE studentId = ${student.studentId}`;
-                await database.execute(updateQuery);
-                console.log(`Synced new student ${student.studentId} with blockchain`);
-            } catch (error) {
-                console.error(`Failed to sync new student ${student.studentId}:`, error);
-            }
+    for (const student of newStudents) {
+        try {
+            // Assuming the 'addStudent' function in 'blockchain.js' accepts student details and returns a promise
+            const txResult = await blockchain.addStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
+            console.log(`Student ${student.studentId} added to blockchain: ${txResult.transactionHash}`);
+
+            // Update database to reflect that the student is synced
+            // Example: await database.query('UPDATE Students SET syncedWithBlockchain = TRUE WHERE studentId = ?', [student.studentId]);
+        } catch (error) {
+            console.error(`Failed to sync new student ${student.studentId}:`, error);
         }
     }
 }
@@ -49,17 +45,20 @@ async function syncNewStudentsWithBlockchain() {
 // Sync updated students with the blockchain
 async function syncUpdatedStudentsWithBlockchain() {
     const updatedStudents = await fetchUpdatedStudents();
-    if (updatedStudents.length > 0) {
-        for (const change of updatedStudents) {
-            try {
-                // Adjust the parameters according to your blockchain function and ChangeLog structure
-                await blockchain.updateStudent(change.studentId, change.newName, change.newProgramme, change.newJoinYear, change.newCgpa, change.newGraduateYear);
-                const updateQuery = `UPDATE ChangeLog SET synced = TRUE WHERE id = ${change.id}`;
-                await database.execute(updateQuery);
-                console.log(`Synced updated student ${change.studentId} with blockchain`);
-            } catch (error) {
-                console.error(`Failed to sync updated student ${change.studentId}:`, error);
-            }
+    for (const change of updatedStudents) {
+        try {
+            // Fetch the complete, latest student data
+            const studentData = await database.query('SELECT * FROM Students WHERE studentId = ?', [change.studentId]);
+            const student = studentData[0];
+
+            // Assuming the 'updateStudent' function in 'blockchain.js' accepts updated student details and returns a promise
+            const txResult = await blockchain.updateStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
+            console.log(`Student ${student.studentId} updated on blockchain: ${txResult.transactionHash}`);
+
+            // Update database to reflect that the student change is synced
+            // Example: await database.query('UPDATE ChangeLog SET syncedWithBlockchain = TRUE WHERE id = ?', [change.id]);
+        } catch (error) {
+            console.error(`Failed to sync change for student ${change.studentId}:`, error);
         }
     }
 }
