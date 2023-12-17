@@ -51,7 +51,7 @@ async function syncUpdatedStudentsWithBlockchain() {
     const updatedStudents = await fetchUpdatedStudents();
     for (const change of updatedStudents) {
         try {
-            const [studentData] = await database.query('SELECT * FROM Students WHERE studentId = ?', [change.studentId]);
+            const [studentData] = await database.execute('SELECT * FROM Students WHERE studentId = ?', [change.studentId]);
             const student = studentData[0];
             const txResult = await blockchain.updateStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
             console.log(`Student ${student.studentId} updated on blockchain: ${txResult.transactionHash}`);
