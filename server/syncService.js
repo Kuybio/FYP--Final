@@ -74,5 +74,6 @@ module.exports = {
     syncNewStudentsWithBlockchain,
     syncUpdatesWithBlockchain,
     fetchNewStudents,
-    fetchUnsyncedChanges
+    fetchUnsyncedChanges,
+    addOrUpdateStudent
 };
