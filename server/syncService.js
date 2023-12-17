@@ -32,14 +32,12 @@ const fetchUnsyncedChanges = () => {
 const syncNewStudentsWithBlockchain = async () => {
     const newStudents = await fetchNewStudents();
     for (const student of newStudents) {
-        // Validate student data
-        if (!student.studentId || !student.name || !student.programme || !student.joinYear || student.cgpa == null || student.graduateYear == null) {
-            console.error(`Invalid data for student ${student.studentId}`);
-            continue; // Skip this student and continue with the next one
-        }
+        // Replace null values with 0
+        const cgpaValue = student.cgpa != null ? student.cgpa : 0;
+        const graduateYearValue = student.graduateYear != null ? student.graduateYear : 0;
 
         try {
-            await blockchain.addStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
+            await blockchain.addStudent(student.studentId, student.name, student.programme, student.joinYear, cgpaValue, graduateYearValue);
             // Mark as synced...
         } catch (error) {
             console.error(`Failed to sync new student ${student.studentId}:`, error);
