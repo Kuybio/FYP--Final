@@ -1,5 +1,5 @@
 const database = require('../server/database'); // Adjust path as necessary
-const { addOrUpdateStudent } = require('../server/blockchain');
+const blockchain = require('../server/blockchain');
 
 // Function to fetch new students who are not yet in the blockchain
 const fetchNewStudents = () => {
