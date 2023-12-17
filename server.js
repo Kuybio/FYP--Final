@@ -3,9 +3,9 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const Web3 = require('web3');
 const schedule = require('node-schedule');
-const blockchain = require('../server/blockchain');
-const database = require('../server/database');
-const { syncWithBlockchain } = require('../server/syncService');
+const blockchain = require('./server/blockchain');
+const database = require('./server/database');
+const { syncWithBlockchain } = require('./server/syncService');
 
 const app = express();
 const port = process.env.PORT || 3000;
