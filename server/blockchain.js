@@ -11,7 +11,7 @@ const sendTransaction = async (tx, privateKey) => {
 };
 
 const addStudent = async (fromAddress, privateKey, studentId, name, programme, joinYear, cgpa, graduateYear) => {
-    const data = contract.methods.addStudent(studentId, name, programme, joinYear, cgpa, graduateYear).encodeABI();
+    const data = universityDataContract.methods.addStudent(studentId, name, programme, joinYear, cgpa, graduateYear).encodeABI();
     const tx = {
         from: fromAddress,
         to: contractAddress,
@@ -22,7 +22,7 @@ const addStudent = async (fromAddress, privateKey, studentId, name, programme, j
 };
 
 const updateStudent = async (fromAddress, privateKey, studentId, name, programme, joinYear, cgpa, graduateYear) => {
-    const data = contract.methods.updateStudent(studentId, name, programme, joinYear, cgpa, graduateYear).encodeABI();
+    const data = universityDataContract.methods.updateStudent(studentId, name, programme, joinYear, cgpa, graduateYear).encodeABI();
     const tx = {
         from: fromAddress,
         to: contractAddress,
