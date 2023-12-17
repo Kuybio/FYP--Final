@@ -8,19 +8,14 @@ const privateKey = '0xa8e80c311133db047d75d286bc69904c0e652f9c98e06891ecaca8b0b1
 const universityDataContract = new web3.eth.Contract(abi, contractAddress);
 
 async function addStudent(studentId, name, programme, joinYear, cgpa, graduateYear) {
-    // Ensure that all parameters are defined and not null
-    if (!studentId || !name || !programme || !joinYear || cgpa == null || graduateYear == null) {
-        throw new Error("Invalid input parameters");
-    }
-
+    // No longer throwing an error for null cgpa or graduateYear as they are handled in syncService.js
     const fromAddress = web3.eth.accounts.privateKeyToAccount(privateKey).address;
     const data = universityDataContract.methods.addStudent(studentId, name, programme, joinYear, cgpa, graduateYear).encodeABI();
-    
     const tx = {
         from: fromAddress,
         to: contractAddress,
         data: data,
-        gas: await estimateGas(fromAddress, data),
+        gas: 2000000,
     };
 
     return sendTransaction(tx, privateKey);
