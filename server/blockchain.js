@@ -36,5 +36,6 @@ async function getStudent(studentId) {
 
 module.exports = {
     addOrUpdateStudent,
-    getStudent
+    getStudent,
+    addStudent
 };
