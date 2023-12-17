@@ -1,5 +1,5 @@
-const database = require('./database'); // Update the path as necessary
-const blockchain = require('./blockchain'); // Update the path as necessary
+const database = require('../server/database'); // Update the path as necessary
+const blockchain = require('../server/blockchain'); // Update the path as necessary
 
 // Function to fetch new students from the database
 async function fetchNewStudents() {
