@@ -1,11 +1,11 @@
 const Web3 = require('web3');
-const UniversityDataContract = require('../build/contracts/UniversityData.json');
+const UniversityDataContract = require('../build/contracts/UniversityData.json').abi;
 
 const web3 = new Web3('http://localhost:7545'); // Adjust with your Ethereum client URL
 const contractAddress = '0x6c35F6F7F727A7bB676e5BB73Ff66C6240D5B50c'; // Replace with your contract address
 
 // Import and initialize universityDataContract
-const universityDataContract = new web3.eth.Contract('../build/contracts/UniversityData.json', 0x6c35F6F7F727A7bB676e5BB73Ff66C6240D5B50c);
+const universityDataContract = new web3.eth.Contract(universityDataContract, '0x6c35F6F7F727A7bB676e5BB73Ff66C6240D5B50c');
 
 const sendTransaction = async (tx, privateKey) => {
     const signedTx = await web3.eth.accounts.signTransaction(tx, privateKey);
