@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Retrieve Student Data</title>
+    <!-- Include web3.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        #studentData { white-space: pre; background: #f0f0f0; padding: 10px; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+<h1>Student Data Retrieval</h1>
+
+<!-- Input form for Student ID -->
+<div>
+    <input type="text" id="studentIdInput" placeholder="Enter Student ID" />
+    <button onclick="fetchStudentData()">Get Student Data</button>
+</div>
+
+<!-- Display area for Student Data -->
+<h2>Student Details:</h2>
+<div id="studentData"></div>
+
+<script>
+    // Check if MetaMask is installed
+    if (typeof window.ethereum !== 'undefined') {
+        // Initialize web3 instance
+        const web3 = new Web3(window.ethereum);
+
+        // Prompt user to connect to MetaMask
+        ethereum.request({ method: 'eth_requestAccounts' });
+
+        // Include your contract's ABI and address directly
+        const contractABI = [
+        {
+          "inputs": [],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "message",
+              "type": "string"
+            }
+          ],
+          "name": "ErrorLog",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "studentId",
+              "type": "uint256"
+            }
+          ],
+          "name": "StudentAdded",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "studentId",
+              "type": "uint256"
+            }
+          ],
+          "name": "StudentUpdated",
+          "type": "event"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "_studentId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "_name",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "_programme",
+              "type": "string"
+            },
+            {
+              "internalType": "uint256",
+              "name": "_joinYear",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "_cgpa",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "_graduateYear",
+              "type": "uint256"
+            }
+          ],
+          "name": "addOrUpdateStudent",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "studentId",
+              "type": "uint256"
+            }
+          ],
+          "name": "getStudent",
+          "outputs": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "studentId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "string",
+                  "name": "name",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "programme",
+                  "type": "string"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "joinYear",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "cgpa",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "graduateYear",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct UniversityData.Student",
+              "name": "",
+              "type": "tuple"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "studentId",
+              "type": "uint256"
+            }
+          ],
+          "name": "getStudentDataHash",
+          "outputs": [
+            {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        }
+      ];
+        const contractAddress = '0x6c35F6F7F727A7bB676e5BB73Ff66C6240D5B50c';
+
+        // Create contract instance
+        const universityDataContract = new web3.eth.Contract(contractABI, contractAddress);
+
+        // Function to fetch student data from the blockchain
+window.fetchStudentData = async function() {
+  const studentId = document.getElementById('studentIdInput').value.trim();
+  if (!studentId) {
+      alert('Please enter a student ID.');
+      return;
+  }
+
+  try {
+      // Use the contract method 'getStudent' to fetch the student data
+      const studentData = await universityDataContract.methods.getStudent(studentId).call();
+      
+      // Convert BigInts to strings
+      const studentDataWithStrings = JSON.parse(JSON.stringify(studentData, (_, v) =>
+          typeof v === 'bigint' ? v.toString() : v));
+      
+      // Format and display the student data
+      const displayArea = document.getElementById('studentData');
+      let displayText = '';
+      displayText += 'Student ID = ' + studentDataWithStrings.studentId + '\n';
+      displayText += 'Name = ' + studentDataWithStrings.name + '\n';
+      displayText += 'Programme = ' + studentDataWithStrings.programme + '\n';
+      displayText += 'Join Year = ' + studentDataWithStrings.joinYear + '\n';
+      displayText += 'CGPA = ' + studentDataWithStrings.cgpa + '\n';
+      displayText += 'Graduate Year = ' + studentDataWithStrings.graduateYear + '\n';
+
+      displayArea.textContent = displayText;
+  } catch (error) {
+      console.error(error);
+      alert('Failed to fetch student data. Make sure you are connected to the correct network and that the student ID is correct.');
+  }
+}
+    }
+</script>
+
+</body>
+</html>
