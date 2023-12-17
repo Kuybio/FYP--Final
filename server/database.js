@@ -12,10 +12,10 @@ connection.connect((err) => {
   console.log('Connected to MySQL Database!');
 });
 
-// Function to execute a query and return a promise
-function execute(query) {
+// Function to execute a query with placeholders and return a promise
+function execute(query, values) {
   return new Promise((resolve, reject) => {
-      connection.query(query, (error, results, fields) => {
+      connection.query(query, values, (error, results, fields) => {
           if (error) {
               reject(error);
               return;
