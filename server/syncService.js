@@ -40,7 +40,7 @@ async function getStudentData(studentId) {
 // Function to sync new students with the blockchain
 async function syncNewStudentsWithBlockchain() {
     const newStudents = await fetchNewStudents();
-    for (const student of newStudents) {
+    for (const student of studentChanges) {
         try {
             // Make sure all data is defined
             const studentData = {
