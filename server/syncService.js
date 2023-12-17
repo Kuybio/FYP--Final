@@ -13,6 +13,7 @@ async function fetchNewStudents() {
         return results; // This will be an array of rows from the database
     } catch (error) {
         console.error('Error fetching new students:', error);
+        console.log('Fetched new students:', results);
         return []; // Always return an array, even if empty
     }
 }
