@@ -10,7 +10,7 @@ const sendTransaction = async (tx, privateKey) => {
     return web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 };
 
-const addStudent = async (fromAddress, privateKey, studentId, name, programme, joinYear, cgpa, graduateYear) => {
+async function addStudent(studentId, name, programme, joinYear, cgpa, graduateYear) {
     const data = universityDataContract.methods.addStudent(studentId, name, programme, joinYear, cgpa, graduateYear).encodeABI();
     const tx = {
         from: fromAddress,
