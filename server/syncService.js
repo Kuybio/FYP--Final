@@ -2,18 +2,19 @@ const database = require('../server/database');
 const blockchain = require('../server/blockchain');
 
 const fetchNewStudents = () => {
-    return new Promise((resolve, reject) => {
-        // Example query: Select students that haven't been synced
-        const query = 'SELECT * FROM Students WHERE syncedWithBlockchain = FALSE OR updateSynced = FALSE';
-        database.query(query, (error, results) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(results);
-            }
+    const fetchNewStudents = () => {
+        return new Promise((resolve, reject) => {
+            const query = 'SELECT * FROM Students WHERE syncedWithBlockchain = FALSE OR updateSynced = FALSE';
+            database.query(query, (error, results) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(results);
+                }
+            });
         });
-    });
-};
+    };
+}
 
 // Function to fetch unsynced changes from the ChangeLog table
 const fetchUnsyncedChanges = () => {
@@ -35,8 +36,9 @@ const syncNewStudentsWithBlockchain = async () => {
     const newStudents = await fetchNewStudents();
     for (const student of newStudents) {
         try {
-            await blockchain.addStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa || 0, student.graduateYear || 0);
-            // Mark these students as synced in the database...
+            const result = await blockchain.addStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa || 0, student.graduateYear || 0);
+            console.log(`Student ${student.studentId} synced successfully with tx: ${result.transactionHash}`);
+            // Update the database to mark the student as synced
         } catch (error) {
             console.error(`Failed to sync new student ${student.studentId}:`, error);
         }
