@@ -7,16 +7,18 @@ const privateKey = 0x6449d67debeb3b9471474b20b74b5e04ebbcf4c97ff48c8dde24b1257f0
 
 // Function to fetch new students from the database
 async function fetchNewStudents() {
-    const query = 'SELECT * FROM Students WHERE syncedWithBlockchain = FALSE';
-    database.query(query, (error, results) => {
-        if (error) {
-            console.error('Error fetching new students:', error);
-            reject(error);
-        } else {
-            resolve(Array.isArray(results) ? results : []);
-        }
-    });
-};
+    try {
+        // Replace with your actual query to fetch new students
+        const query = 'SELECT * FROM Students WHERE syncedWithBlockchain = FALSE';
+        const results = await database.execute(query);
+        
+        // Assuming 'results' is an array of students
+        return results;
+    } catch (error) {
+        console.error('Error fetching new students:', error);
+        return []; // Always return an array, even if empty
+    }
+}
 
 // Function to fetch updated student changes from the ChangeLog table
 async function fetchUpdatedStudents() {
