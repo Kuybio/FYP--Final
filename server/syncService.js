@@ -53,7 +53,14 @@ async function syncUpdatedStudentsWithBlockchain() {
         try {
             const [studentData] = await database.execute('SELECT * FROM Students WHERE studentId = ?', [change.studentId]);
             const student = studentData[0];
-            const txResult = await blockchain.updateStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
+            if (student && student.studentId && student.name && student.programme && student.joinYear && student.cgpa && student.graduateYear) {
+                const txResult = await blockchain.updateStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
+                // Rest of your code here
+              } else {
+                console.error("Invalid student data:", student);
+                // Handle the error or invalid data appropriately
+              }
+              
             console.log(`Student ${student.studentId} updated on blockchain: ${txResult.transactionHash}`);
             // Update database as synced
         } catch (error) {
