@@ -18,7 +18,7 @@ connection.connect((err) => {
 // Fetch new students who haven't been synced with the blockchain yet
 function getNewStudents() {
   return new Promise((resolve, reject) => {
-    const query = 'SELECT * FROM Students WHERE isNew = 1';
+    const query = 'SELECT * FROM Students WHERE isNew = 0';
     connection.query(query, (err, results) => {
       if (err) {
         reject(err);
@@ -32,7 +32,7 @@ function getNewStudents() {
 // Fetch updated students who haven't been synced with the blockchain yet
 function getUpdatedStudents() {
   return new Promise((resolve, reject) => {
-    const query = 'SELECT * FROM Students WHERE isUpdated = 1';
+    const query = 'SELECT * FROM Students WHERE isUpdated = 0';
     connection.query(query, (err, results) => {
       if (err) {
         reject(err);
@@ -48,9 +48,9 @@ function markStudentSynced(studentId, type) {
   return new Promise((resolve, reject) => {
     let query;
     if (type === 'new') {
-      query = 'UPDATE Students SET isNew = 0 WHERE studentId = ?';
+      query = 'UPDATE Students SET isNew = 1 WHERE studentId = ?';
     } else if (type === 'update') {
-      query = 'UPDATE Students SET isUpdated = 0 WHERE studentId = ?';
+      query = 'UPDATE Students SET isUpdated = 1 WHERE studentId = ?';
     }
 
     connection.query(query, [studentId], (err, results) => {
