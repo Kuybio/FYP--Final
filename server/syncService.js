@@ -1,80 +1,39 @@
-const database = require('../server/database'); // Update the path as necessary
-const blockchain = require('../server/blockchain'); // Update the path as necessary
+const Web3 = require('web3');
+const contract = require('@truffle/contract');
 
-// Function to fetch new students from the database
-async function fetchNewStudents() {
-    try {
-        const query = 'SELECT * FROM Students WHERE syncedWithBlockchain = FALSE';
-        const [results] = await database.execute(query);
-        return Array.isArray(results) ? results : [results]; // Ensure an array is returned
-    } catch (error) {
-        console.error('Error fetching new students:', error);
-        return []; // Return an empty array in case of error
-    }
+// Define the ABI and address of your deployed contract
+const universityDataABI = [/* ... ABI of your contract ... */];
+const contractAddress = '/* Your Contract Address */';
+
+// Initialize web3
+const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+
+// Initialize the contract
+const UniversityDataContract = contract({
+  abi: universityDataABI,
+});
+UniversityDataContract.setProvider(web3.currentProvider);
+
+// Function to add a new student
+async function addStudent(studentId, name, programme, joinYear, cgpa, graduateYear) {
+  const instance = await UniversityDataContract.at(contractAddress);
+  await instance.addStudent(studentId, name, programme, joinYear, cgpa, graduateYear, { from: web3.eth.defaultAccount });
 }
 
-// Function to fetch updated students from the database
-async function fetchUpdatedStudents() {
-    try {
-        // Update the query as per your database schema
-        const query = 'SELECT * FROM ChangeLog WHERE synced = FALSE';
-        const [results] = await database.execute(query);
-        return Array.isArray(results) ? results : [results]; // Ensure an array is returned
-    } catch (error) {
-        console.error('Error fetching updated students:', error);
-        return []; // Return an empty array in case of error
-    }
+// Function to update an existing student
+async function updateStudent(studentId, name, programme, joinYear, cgpa, graduateYear) {
+  const instance = await UniversityDataContract.at(contractAddress);
+  await instance.updateStudent(studentId, name, programme, joinYear, cgpa, graduateYear, { from: web3.eth.defaultAccount });
 }
 
-
-// Sync new students with the blockchain
-async function syncNewStudentsWithBlockchain() {
-    const newStudents = await fetchNewStudents();
-    if (Array.isArray(newStudents)) {
-        for (const student of newStudents) {
-            try {
-                const txResult = await blockchain.addStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
-                console.log(`Student ${student.studentId} added to blockchain: ${txResult.transactionHash}`);
-                // Update database as synced
-            } catch (error) {
-                console.error(`Failed to sync new student ${student.studentId}:`, error);
-            }
-        }
-    } else {
-        console.error('newStudents is not an array:', newStudents);
-    }
+// Function to get student data
+async function getStudent(studentId) {
+  const instance = await UniversityDataContract.at(contractAddress);
+  return await instance.getStudent(studentId);
 }
 
-
-// Sync updated students with the blockchain
-async function syncUpdatedStudentsWithBlockchain() {
-    const updatedStudents = await fetchUpdatedStudents();
-    for (const change of updatedStudents) {
-        try {
-            const [studentData] = await database.execute('SELECT * FROM Students WHERE studentId = ?', [change.studentId]);
-            const student = studentData[0];
-            if (student && student.studentId && student.name && student.programme && student.joinYear && student.cgpa && student.graduateYear) {
-                const txResult = await blockchain.updateStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
-                // Rest of your code here
-              } else {
-                console.error("Invalid student data:", student);
-                // Handle the error or invalid data appropriately
-              }
-              
-            console.log(`Student ${student.studentId} updated on blockchain: ${txResult.transactionHash}`);
-            // Update database as synced
-        } catch (error) {
-            console.error(`Failed to sync change for student ${change.studentId}:`, error);
-        }
-    }
-}
-
-// Schedule the sync jobs
-setInterval(syncNewStudentsWithBlockchain, 30000); // Sync new students every 30 seconds
-setInterval(syncUpdatedStudentsWithBlockchain, 30000); // Sync updated students every 30 seconds
-
-// Export the functions for use in server.js
 module.exports = {
-    syncNewStudentsWithBlockchain,
-    syncUpdatedStudentsWithBlockchain
+  addStudent,
+  updateStudent,
+  getStudent,
 };
