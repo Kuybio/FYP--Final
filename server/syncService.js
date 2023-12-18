@@ -46,3 +46,8 @@ async function updateStudentOnBlockchain(student) {
 
 // Start the sync process
 syncWithBlockchain();
+
+module.exports = {
+  syncNewStudentsWithBlockchain,
+  // other functions or variables to export
+};
