@@ -1,6 +1,6 @@
 const Web3 = require('web3');
 const universityDataABI = require('../build/contracts/UniversityData.json').abi; // Import ABI
-const contractAddress = '0x6c35F6F7F727A7bB676e5BB73Ff66C6240D5B50c'; // Use your contract address here
+const contractAddress = '0x9A6e79edc16E6CCFfB9daC280ED734FA52623CB0'; // Use your contract address here
 
 // Initialize web3
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
