@@ -6,28 +6,48 @@ const contractAddress = '0x6c35F6F7F727A7bB676e5BB73Ff66C6240D5B50c'; // Use you
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
 
 // Create a contract instance
-const UniversityDataContract = new web3.eth.Contract(universityDataABI, contractAddress);
+const universityDataContract = new web3.eth.Contract(universityDataABI, contractAddress);
 
-// Function to add a new student with a fixed gas limit
-async function addStudent(studentId, name, programme, joinYear, cgpa, graduateYear) {
+// Function to add a new student
+async function addStudent(studentId, name, programme, joinYear, cgpa, graduateYear, fromAddress, privateKey) {
     try {
-        const accounts = await web3.eth.getAccounts();
-        const result = await UniversityDataContract.methods.addStudent(studentId, name, programme, joinYear, cgpa, graduateYear).send({ from: accounts[0], gas: 2000000 });
-        console.log(`Student added: ${result.transactionHash}`);
-        return result;
+        const data = universityDataContract.methods.addStudent(studentId, name, programme, joinYear, cgpa, graduateYear).encodeABI();
+
+        const tx = {
+            from: fromAddress,
+            to: contractAddress,
+            gas: 2000000, // Set the gas limit
+            data: data
+        };
+
+        const signedTx = await web3.eth.accounts.signTransaction(tx, privateKey);
+        const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+
+        console.log(`Student added: Transaction hash - ${receipt.transactionHash}`);
+        return receipt;
     } catch (error) {
         console.error(`Error adding student: ${error.message}`);
         throw error;
     }
 }
 
-// Function to update an existing student with a fixed gas limit
-async function updateStudent(studentId, name, programme, joinYear, cgpa, graduateYear) {
+// Function to update an existing student
+async function updateStudent(studentId, name, programme, joinYear, cgpa, graduateYear, fromAddress, privateKey) {
     try {
-        const accounts = await web3.eth.getAccounts();
-        const result = await UniversityDataContract.methods.updateStudent(studentId, name, programme, joinYear, cgpa, graduateYear).send({ from: accounts[0], gas: 2000000 });
-        console.log(`Student updated: ${result.transactionHash}`);
-        return result;
+        const data = universityDataContract.methods.updateStudent(studentId, name, programme, joinYear, cgpa, graduateYear).encodeABI();
+
+        const tx = {
+            from: fromAddress,
+            to: contractAddress,
+            gas: 2000000, // Set the gas limit
+            data: data
+        };
+
+        const signedTx = await web3.eth.accounts.signTransaction(tx, privateKey);
+        const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+
+        console.log(`Student updated: Transaction hash - ${receipt.transactionHash}`);
+        return receipt;
     } catch (error) {
         console.error(`Error updating student: ${error.message}`);
         throw error;
