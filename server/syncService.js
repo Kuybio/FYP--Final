@@ -1,39 +1,48 @@
-const Web3 = require('web3');
-const contract = require('@truffle/contract');
+const { addStudent, updateStudent, getStudent } = require('../server/blockchain');
+const { getUpdatedStudents, getNewStudents, markStudentSynced } = require('../server/database');
 
-// Define the ABI and address of your deployed contract
-const universityDataABI = [/* ... ABI of your contract ... */];
-const contractAddress = '/* Your Contract Address */';
+// Interval for syncing with the blockchain
+const SYNC_INTERVAL = 10000; // 10 seconds, adjust as needed
 
-// Initialize web3
-const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+async function syncWithBlockchain() {
+  try {
+    // Sync new students
+    const newStudents = await getNewStudents();
+    for (const student of newStudents) {
+      await addStudentToBlockchain(student);
+      await markStudentSynced(student.studentId, 'new');
+    }
 
-// Initialize the contract
-const UniversityDataContract = contract({
-  abi: universityDataABI,
-});
-UniversityDataContract.setProvider(web3.currentProvider);
+    // Sync updated students
+    const updatedStudents = await getUpdatedStudents();
+    for (const student of updatedStudents) {
+      await updateStudentOnBlockchain(student);
+      await markStudentSynced(student.studentId, 'update');
+    }
+  } catch (error) {
+    console.error('Failed to sync with blockchain:', error);
+  }
 
-// Function to add a new student
-async function addStudent(studentId, name, programme, joinYear, cgpa, graduateYear) {
-  const instance = await UniversityDataContract.at(contractAddress);
-  await instance.addStudent(studentId, name, programme, joinYear, cgpa, graduateYear, { from: web3.eth.defaultAccount });
+  setTimeout(syncWithBlockchain, SYNC_INTERVAL);
 }
 
-// Function to update an existing student
-async function updateStudent(studentId, name, programme, joinYear, cgpa, graduateYear) {
-  const instance = await UniversityDataContract.at(contractAddress);
-  await instance.updateStudent(studentId, name, programme, joinYear, cgpa, graduateYear, { from: web3.eth.defaultAccount });
+async function addStudentToBlockchain(student) {
+  try {
+    await addStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
+    console.log(`Successfully added student ${student.studentId} to the blockchain.`);
+  } catch (error) {
+    console.error(`Failed to add student ${student.studentId} to the blockchain:`, error);
+  }
 }
 
-// Function to get student data
-async function getStudent(studentId) {
-  const instance = await UniversityDataContract.at(contractAddress);
-  return await instance.getStudent(studentId);
+async function updateStudentOnBlockchain(student) {
+  try {
+    await updateStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
+    console.log(`Successfully updated student ${student.studentId} on the blockchain.`);
+  } catch (error) {
+    console.error(`Failed to update student ${student.studentId} on the blockchain:`, error);
+  }
 }
 
-module.exports = {
-  addStudent,
-  updateStudent,
-  getStudent,
-};
+// Start the sync process
+syncWithBlockchain();
