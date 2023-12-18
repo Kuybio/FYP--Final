@@ -10,7 +10,7 @@ const syncService = require('./server/syncService'); // Import syncService as a 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Serve static files from the public directory
+// Serve static files from the public directory 
 app.use(express.static(path.join(__dirname, 'client', 'public')));
 
 // Body parser middleware to handle JSON data
@@ -22,8 +22,7 @@ const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
 // Schedule a job to sync with the blockchain periodically
 const syncJob = schedule.scheduleJob('*/1 * * * *', function() {
     console.log('Running Sync Job');
-    syncService.syncNewStudentsWithBlockchain();
-    syncService.syncUpdatedStudentsWithBlockchain();
+    syncService.syncWithBlockchain();
 });
 
 // Endpoint to add a student (can be used if manual addition is needed)

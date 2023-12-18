@@ -48,6 +48,6 @@ async function updateStudentOnBlockchain(student) {
 syncWithBlockchain();
 
 module.exports = {
-  syncNewStudentsWithBlockchain,
+  syncWithBlockchain,
   // other functions or variables to export
 };
