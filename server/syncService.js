@@ -24,10 +24,12 @@ async function syncWithBlockchain() {
   }
 
   setTimeout(syncWithBlockchain, SYNC_INTERVAL);
-}
+} 
 
 async function addStudentToBlockchain(student) {
   try {
+    const fromAddress = '0xB4cE6bac673F150ba36D53E3dfd94dCf59a3129c'; 
+    const privateKey = '0x6449d67debeb3b9471474b20b74b5e04ebbcf4c97ff48c8dde24b1257f07ad6b'; 
     await addStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
     console.log(`Successfully added student ${student.studentId} to the blockchain.`);
   } catch (error) {
@@ -37,6 +39,8 @@ async function addStudentToBlockchain(student) {
 
 async function updateStudentOnBlockchain(student) {
   try {
+    const fromAddress = '0xB4cE6bac673F150ba36D53E3dfd94dCf59a3129c'; 
+    const privateKey = '0x6449d67debeb3b9471474b20b74b5e04ebbcf4c97ff48c8dde24b1257f07ad6b'; 
     await updateStudent(student.studentId, student.name, student.programme, student.joinYear, student.cgpa, student.graduateYear);
     console.log(`Successfully updated student ${student.studentId} on the blockchain.`);
   } catch (error) {
