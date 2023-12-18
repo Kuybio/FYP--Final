@@ -10,16 +10,30 @@ const UniversityDataContract = new web3.eth.Contract(universityDataABI, contract
 
 // Function to add a new student with specified gas limit
 async function addStudent(studentId, name, programme, joinYear, cgpa, graduateYear) {
-    const accounts = await web3.eth.getAccounts();
-    const estimatedGas = await UniversityDataContract.methods.addStudent(studentId, name, programme, joinYear, cgpa, graduateYear).estimateGas({ from: accounts[0] });
-    await UniversityDataContract.methods.addStudent(studentId, name, programme, joinYear, cgpa, graduateYear).send({ from: accounts[0], gas: estimatedGas });
+    try {
+        const accounts = await web3.eth.getAccounts();
+        const estimatedGas = await UniversityDataContract.methods.addStudent(studentId, name, programme, joinYear, cgpa, graduateYear).estimateGas({ from: accounts[0] });
+        const result = await UniversityDataContract.methods.addStudent(studentId, name, programme, joinYear, cgpa, graduateYear).send({ from: accounts[0], gas: estimatedGas });
+        console.log(`Student added: ${result.transactionHash}`);
+        return result;
+    } catch (error) {
+        console.error(`Error adding student: ${error.message}`);
+        throw error;
+    }
 }
 
 // Function to update an existing student with specified gas limit
 async function updateStudent(studentId, name, programme, joinYear, cgpa, graduateYear) {
-    const accounts = await web3.eth.getAccounts();
-    const estimatedGas = await UniversityDataContract.methods.updateStudent(studentId, name, programme, joinYear, cgpa, graduateYear).estimateGas({ from: accounts[0] });
-    await UniversityDataContract.methods.updateStudent(studentId, name, programme, joinYear, cgpa, graduateYear).send({ from: accounts[0], gas: estimatedGas });
+    try {
+        const accounts = await web3.eth.getAccounts();
+        const estimatedGas = await UniversityDataContract.methods.updateStudent(studentId, name, programme, joinYear, cgpa, graduateYear).estimateGas({ from: accounts[0] });
+        const result = await UniversityDataContract.methods.updateStudent(studentId, name, programme, joinYear, cgpa, graduateYear).send({ from: accounts[0], gas: estimatedGas });
+        console.log(`Student updated: ${result.transactionHash}`);
+        return result;
+    } catch (error) {
+        console.error(`Error updating student: ${error.message}`);
+        throw error;
+    }
 }
 
 // Other functions...
