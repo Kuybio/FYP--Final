@@ -39,6 +39,7 @@ contract UniversityData {
     // Get student data
     function getStudent(uint256 _studentId) public view returns (Student memory) {
         require(_studentId != 0, "Invalid Student ID");
+        require(students[_studentId].studentId != 0, "Student not found");
         return students[_studentId];
     }
 }
