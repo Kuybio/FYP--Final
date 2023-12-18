@@ -1,5 +1,5 @@
 const Web3 = require('web3');
-const contract = require('@truffle/contract');
+const contract = require('../build/contracts/UniversityData.json');
 
 // Define the ABI and address of your deployed contract
 const universityDataABI = [
