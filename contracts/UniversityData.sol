@@ -18,6 +18,8 @@ contract UniversityData {
 
     // Add a new student
     function addStudent(uint256 _studentId, string memory _name, string memory _programme, uint256 _joinYear, uint256 _cgpa, uint256 _graduateYear) public {
+         require(_studentId != 0, "Invalid Student ID");
+        require(_cgpa <= 400, "Invalid CGPA");
         require(students[_studentId].studentId == 0, "Student already exists");
         
         bytes32 dataHash = sha256(abi.encodePacked(_studentId, _name, _programme, _joinYear, _cgpa, _graduateYear));
